@@ -17,26 +17,6 @@ function build(r, cphi, thetaFunc)
 	end
 end
 
---[[ [l][m]
-return {
-	[0] = {
-		[0] = build(1/2 * sqrt(1/pi), 0, constant(1)),
-	},
-	[1] = {
-		[-1] = build(1/2 * sqrt(3/(2*pi)), -1, sin),
-		[0] = build(1/2 * sqrt(3/pi), 0, cos),
-		[1] = build(-1/2 * sqrt(3/(2*pi)), 1, sin),
-	},
-	[2] = {
-		[-2] = build(1/4 * sqrt(15/(2*pi)), -2, sin*sin),
-		[-1] = build(1/2 * sqrt(15/(2*pi)), -1, sin*cos),
-		[0] = build(1/4 * sqrt(5/pi), 0, 3*cos^2-1),
-		[1] = build(-1/2 * sqrt(15/(2*pi)), 1, sin*cos),
-		[2] = build(1/4 * sqrt(15/(2*pi)), 2, sin*sin),
-	},
-}
---]]
-
 local factorial = require 'factorial'
 local associatedLegendre = require 'associatedlegendre'
 

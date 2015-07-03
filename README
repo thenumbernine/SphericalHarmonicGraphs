@@ -1,6 +1,6 @@
 uses
 	malkia's ufo
 	ext
-	vec
-	symmath to compute associated legendre polynomials
-	plot2d for the plot_associatedlegendre utility
+	vec -- for camera quaternion support
+	symmath -- to compute associated legendre polynomials
+	plot2d -- for the plot_associatedlegendre utility
