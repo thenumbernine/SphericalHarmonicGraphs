@@ -20,6 +20,8 @@ local angle = quat()
 
 local SHApp = class(GLApp)
 
+SHApp.title = 'Spherical Harmonics Graph' 
+
 function SHApp:initGL()
 	gl.glEnable(gl.GL_DEPTH_TEST)
 	gl.glEnable(gl.GL_COLOR_MATERIAL)
