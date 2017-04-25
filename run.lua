@@ -1,6 +1,6 @@
 #! /usr/bin/env luajit
 local class = require 'ext.class'
-local gl = require 'ffi.OpenGL'
+local gl = require 'gl'
 local GLApp = require 'glapp'
 local quat = require 'vec.quat'
 local vec3 = require 'vec.vec3'
