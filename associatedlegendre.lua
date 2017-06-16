@@ -16,7 +16,7 @@ do
 				P = P:diff(x):simplify()
 			end
 			P = (P * (-1)^m / (2^l * factorial(l)) * (1 - x^2)^(m/2))
-				:simplify():compile{x=x}
+				:simplify():compile{{x=x}}
 		end	
 		
 		cache[l][m] = P
@@ -26,4 +26,3 @@ do
 end
 
 return associatedLegendre
-

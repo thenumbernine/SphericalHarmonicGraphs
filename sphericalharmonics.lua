@@ -24,4 +24,3 @@ return {
 	real = realSphericalHarmonics,
 	complex = complexSphericalHarmonics,
 }
-

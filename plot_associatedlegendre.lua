@@ -23,4 +23,3 @@ for l=0,lmax do
 	end
 end
 plot2d(graphs)
-
