@@ -154,4 +154,4 @@ function SHApp:update()
 	end
 end
 
-SHApp():run()
+return SHApp():run()
