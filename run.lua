@@ -5,7 +5,7 @@ local GLApp = require 'glapp'
 local quat = require 'vec.quat'
 local vec3 = require 'vec.vec3'
 local sphericalHarmonics = require 'sphericalharmonics'
-local sdl = require 'ffi.sdl'
+local sdl = require 'ffi.req' 'sdl'
 
 local lmax = tonumber(arg[1]) or 3
 local distance = lmax
