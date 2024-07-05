@@ -1,19 +1,12 @@
 #! /usr/bin/env luajit
 local gl = require 'gl'
-local GLApp = require 'glapp'
-local quat = require 'vec.quat'
-local vec3 = require 'vec.vec3'
+local vec3d = require 'vec-ffi.vec3d'
 local sphericalHarmonics = require 'sphericalharmonics'
 
 local lmax = tonumber(arg[1]) or 3
 
 local idiv = 360
 local jdiv = 180
-
-local angle = quat()
---	* quat():fromAngleAxis(0,0,1,180)
---	* quat():fromAngleAxis(1,0,0,90)
-
 
 local SHApp = require 'glapp.orbit'():subclass()
 
@@ -35,7 +28,7 @@ do
 		cache[l] = cache[l] or {}
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
-		if cache[l][m][i][j] then return unpack(cache[l][m][i][j]) end
+		if cache[l][m][i][j] then return cache[l][m][i][j] end
 		
 		local phi = i/idiv*2*math.pi
 		local theta = j/jdiv*math.pi
@@ -44,9 +37,9 @@ do
 		local x = r * math.sin(theta) * math.cos(phi)
 		local y = r * math.sin(theta) * math.sin(phi)
 		local z = r * math.cos(theta)
-		local c = {Y,x,y,z}
+		local c = {Y=Y, vec=vec3d(x,y,z)}
 		cache[l][m][i][j] = c
-		return unpack(c)
+		return c
 	end
 end
 
@@ -57,15 +50,15 @@ do
 		cache[l] = cache[l] or {}
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
-		if cache[l][m][i][j] then return unpack(cache[l][m][i][j]) end
+		if cache[l][m][i][j] then return cache[l][m][i][j] end
 		
-		local ip = vec3(select(2, vtx(l,m,i+1,j)))
-		local im = vec3(select(2, vtx(l,m,i-1,j)))
-		local jp = vec3(select(2, vtx(l,m,i,j+1)))
-		local jm = vec3(select(2, vtx(l,m,i,j-1)))
-		local c = -vec3.cross(ip-im,jp-jm):normalize()
+		local ip = vec3d(vtx(l,m,i+1,j).vec)
+		local im = vec3d(vtx(l,m,i-1,j).vec)
+		local jp = vec3d(vtx(l,m,i,j+1).vec)
+		local jm = vec3d(vtx(l,m,i,j-1).vec)
+		local c = -vec3d.cross(ip-im,jp-jm):normalize()
 		cache[l][m][i][j] = c
-		return unpack(c)
+		return c
 	end
 end
 
@@ -88,14 +81,16 @@ function SHApp:update()
 					gl.glBegin(gl.GL_TRIANGLE_STRIP)
 					for j=0,jdiv do
 						for iofs=0,1 do
-							local Y, x, y, z = vtx(l,m,i+iofs,j)
+							local vsrc = vtx(l,m,i+iofs,j)
+							local Y = vsrc.Y
+							local vec = vsrc.vec
 							if Y >= 0 then
 								gl.glColor3f(1,0,0)
 							else
 								gl.glColor3f(0,1,1)
 							end
-							gl.glNormal3f(normal(l,m,i+iofs,j))
-							gl.glVertex3f(x,y,z)
+							gl.glNormal3f(normal(l,m,i+iofs,j):unpack())
+							gl.glVertex3f(vec:unpack())
 						end
 					end
 					gl.glEnd()
