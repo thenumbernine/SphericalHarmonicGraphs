@@ -2,6 +2,7 @@
 local gl = require 'gl'
 local vec3d = require 'vec-ffi.vec3d'
 local sphericalHarmonics = require 'sphericalharmonics'
+local glCallOrRun = require 'gl.call'
 
 local lmax = tonumber(arg[1]) or 3
 
@@ -62,15 +63,12 @@ do
 	end
 end
 
-local list
+local list = {}
 function SHApp:update()
 	SHApp.super.update(self)
 	gl.glClear(gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT)
 	
-	if not list then
-		list = gl.glGenLists(1)
-		gl.glNewList(list, gl.GL_COMPILE_AND_EXECUTE)
-	
+	glCallOrRun(list, function()
 		for l=0,lmax do
 			for m=-l,l do
 				print('building l='..l..' m='..m)
@@ -96,10 +94,7 @@ function SHApp:update()
 				gl.glPopMatrix()
 			end
 		end
-		gl.glEndList()
-	else
-		gl.glCallList(list)
-	end
+	end)
 end
 
 return SHApp():run()
