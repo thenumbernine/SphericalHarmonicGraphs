@@ -1,14 +1,11 @@
 #! /usr/bin/env luajit
-local class = require 'ext.class'
 local gl = require 'gl'
 local GLApp = require 'glapp'
 local quat = require 'vec.quat'
 local vec3 = require 'vec.vec3'
 local sphericalHarmonics = require 'sphericalharmonics'
-local sdl = require 'ffi.req' 'sdl'
 
 local lmax = tonumber(arg[1]) or 3
-local distance = lmax
 
 local idiv = 360
 local jdiv = 180
@@ -18,11 +15,12 @@ local angle = quat()
 --	* quat():fromAngleAxis(1,0,0,90)
 
 
-local SHApp = class(GLApp)
+local SHApp = require 'glapp.orbit'():subclass()
 
 SHApp.title = 'Spherical Harmonics Graph' 
+SHApp.viewDist = lmax
 
-function SHApp:initGL()
+function SHApp:initGL(...)
 	gl.glEnable(gl.GL_DEPTH_TEST)
 	gl.glEnable(gl.GL_COLOR_MATERIAL)
 	gl.glColorMaterial(gl.GL_FRONT_AND_BACK, gl.GL_DIFFUSE)
@@ -71,54 +69,11 @@ do
 	end
 end
 
-local leftMouseButtonDown
-local leftShiftDown 
-local rightShiftDown
-function SHApp:event(e)
-	if e.type == sdl.SDL_MOUSEMOTION and leftMouseButtonDown then
-		local dx = e.motion.xrel
-		local dy = e.motion.yrel
-		if leftShiftDown or rightShiftDown then
-			distance = distance * math.exp(-.01 * dy)
-		else
-			local r = math.sqrt(dx*dx + dy*dy)
-			local rot = quat():fromAngleAxis(dy, dx, 0, r)
-			angle = rot * angle
-		end
-	end
-	if e.type == sdl.SDL_MOUSEBUTTONDOWN then
-		leftMouseButtonDown = true
-	end
-	if e.type == sdl.SDL_MOUSEBUTTONUP then
-		leftMouseButtonDown = false
-	end
-	if e.type == sdl.SDL_KEYDOWN then
-		if e.key.keysym.sym == sdl.SDLK_LSHIFT then leftShiftDown = true end
-		if e.key.keysym.sym == sdl.SDLK_RSHIFT then rightShiftDown = true end
-	end
-	if e.type == sdl.SDL_KEYUP then
-		if e.key.keysym.sym == sdl.SDLK_LSHIFT then leftShiftDown = false end
-		if e.key.keysym.sym == sdl.SDLK_RSHIFT then rightShiftDown = false end
-	end
-end
-
 local list
 function SHApp:update()
+	SHApp.super.update(self)
 	gl.glClear(gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT)
 	
-	gl.glMatrixMode(gl.GL_PROJECTION)
-	gl.glLoadIdentity()
-	local znear = .01
-	local zfar = 10
-	local ar = self.width / self.height
-	gl.glFrustum(-ar*znear, ar*znear, -znear, znear, znear, zfar)
-	
-	gl.glMatrixMode(gl.GL_MODELVIEW)
-	gl.glLoadIdentity()
-	gl.glTranslatef(0,0,-distance)
-	local aa = angle:toAngleAxis()
-	gl.glRotatef(aa[4], aa[1], aa[2], aa[3])
-
 	if not list then
 		list = gl.glGenLists(1)
 		gl.glNewList(list, gl.GL_COMPILE_AND_EXECUTE)
