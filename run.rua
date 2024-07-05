@@ -1,4 +1,4 @@
-#! /usr/bin/env luajit
+#! /usr/bin/env rua
 local gl = require 'gl'
 local vec3d = require 'vec-ffi.vec3d'
 local sphericalHarmonics = require 'sphericalharmonics'
@@ -13,7 +13,7 @@ local SHApp = require 'glapp.orbit'():subclass()
 SHApp.title = 'Spherical Harmonics Graph' 
 SHApp.viewDist = lmax
 
-function SHApp:initGL(...)
+SHApp.initGL = [:] do
 	gl.glEnable(gl.GL_DEPTH_TEST)
 	gl.glEnable(gl.GL_COLOR_MATERIAL)
 	gl.glColorMaterial(gl.GL_FRONT_AND_BACK, gl.GL_DIFFUSE)
@@ -24,7 +24,7 @@ end
 local vtx
 do
 	local cache = {}
-	vtx = function(l,m,i,j)
+	vtx = [l,m,i,j] do
 		cache[l] = cache[l] or {}
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
@@ -46,7 +46,7 @@ end
 local normal
 do
 	local cache = {}
-	normal = function(l,m,i,j)
+	normal = [l,m,i,j] do
 		cache[l] = cache[l] or {}
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
@@ -63,9 +63,9 @@ do
 end
 
 local list
-function SHApp:update()
+SHApp.update = [:] do
 	SHApp.super.update(self)
-	gl.glClear(gl.GL_COLOR_BUFFER_BIT + gl.GL_DEPTH_BUFFER_BIT)
+	gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 	
 	if not list then
 		list = gl.glGenLists(1)
