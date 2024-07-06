@@ -25,12 +25,7 @@ end
 local vtx
 do
 	local cache = {}
-	vtx = [l,m,i,j] do
-		cache[l] = cache[l] or {}
-		cache[l][m] = cache[l][m] or {}
-		cache[l][m][i] = cache[l][m][i] or {}
-		if cache[l][m][i][j] then return cache[l][m][i][j] end
-
+	vtx = [l,m,i,j] cache ?[l]:{} ?[m]:{} ?[i]:{} ?[j]:([]do
 		local phi = i/idiv*2*math.pi
 		local theta = j/jdiv*math.pi
 		local Y = sphericalHarmonics.real(l, m, theta, phi)
@@ -38,30 +33,20 @@ do
 		local x = r * math.sin(theta) * math.cos(phi)
 		local y = r * math.sin(theta) * math.sin(phi)
 		local z = r * math.cos(theta)
-		local c = {Y=Y, vec=vec3d(x,y,z)}
-		cache[l][m][i][j] = c
-		return c
-	end
+		return {Y=Y, vec=vec3d(x,y,z)}
+	end)()
 end
 
 local normal
 do
 	local cache = {}
-	normal = [l,m,i,j] do
-		cache[l] = cache[l] or {}
-		cache[l][m] = cache[l][m] or {}
-		cache[l][m][i] = cache[l][m][i] or {}
-		local c = cache[l][m][i][j]
-		if not c then
-			local ip = vec3d(vtx(l,m,i+1,j).vec)
-			local im = vec3d(vtx(l,m,i-1,j).vec)
-			local jp = vec3d(vtx(l,m,i,j+1).vec)
-			local jm = vec3d(vtx(l,m,i,j-1).vec)
-			c = -(ip-im):cross(jp-jm):normalize()
-			cache[l][m][i][j] = c
-		end
-		return c
-	end
+	normal = [l,m,i,j] cache ?[l]:{} ?[m]:{} ?[i]:{} ?[j]:([]do
+		local ip = vec3d(vtx(l,m,i+1,j).vec)
+		local im = vec3d(vtx(l,m,i-1,j).vec)
+		local jp = vec3d(vtx(l,m,i,j+1).vec)
+		local jm = vec3d(vtx(l,m,i,j-1).vec)
+		return -(ip-im):cross(jp-jm):normalize()
+	end)()
 end
 
 local list = {}
