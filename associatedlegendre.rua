@@ -1,0 +1,15 @@
+local symmath = require 'symmath'
+local factorial = require 'factorial'
+
+local associatedLegendre
+local cache = {}
+associatedLegendre = [l,m,x] ((cache ?[l]:{} ?[m]:([]do
+	local x = symmath.var'x'
+	local P = (x^2-1)^l
+	for i=1,l+m do
+		P = P:diff(x):simplify()
+	end
+	P = (P * (-1)^m / (2^l * factorial(l)) * (1 - x^2)^(m/2)):simplify()
+	return P:compile{x}
+end)())(x))
+return associatedLegendre
