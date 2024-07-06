@@ -11,7 +11,7 @@ local jdiv = 180
 
 local SHApp = require 'glapp.orbit'():subclass()
 
-SHApp.title = 'Spherical Harmonics Graph' 
+SHApp.title = 'Spherical Harmonics Graph'
 SHApp.viewDist = lmax
 
 SHApp.initGL = [:] do
@@ -21,7 +21,7 @@ SHApp.initGL = [:] do
 	gl.glEnable(gl.GL_LIGHTING)
 	gl.glEnable(gl.GL_LIGHT0)
 end
-		
+
 local vtx
 do
 	local cache = {}
@@ -30,11 +30,11 @@ do
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
 		if cache[l][m][i][j] then return cache[l][m][i][j] end
-		
+
 		local phi = i/idiv*2*math.pi
 		local theta = j/jdiv*math.pi
 		local Y = sphericalHarmonics.real(l, m, theta, phi)
-		local r = math.abs(Y)	
+		local r = math.abs(Y)
 		local x = r * math.sin(theta) * math.cos(phi)
 		local y = r * math.sin(theta) * math.sin(phi)
 		local z = r * math.cos(theta)
@@ -51,14 +51,15 @@ do
 		cache[l] = cache[l] or {}
 		cache[l][m] = cache[l][m] or {}
 		cache[l][m][i] = cache[l][m][i] or {}
-		if cache[l][m][i][j] then return cache[l][m][i][j] end
-		
-		local ip = vec3d(vtx(l,m,i+1,j).vec)
-		local im = vec3d(vtx(l,m,i-1,j).vec)
-		local jp = vec3d(vtx(l,m,i,j+1).vec)
-		local jm = vec3d(vtx(l,m,i,j-1).vec)
-		local c = -(ip-im):cross(jp-jm):normalize()
-		cache[l][m][i][j] = c
+		local c = cache[l][m][i][j]
+		if not c then
+			local ip = vec3d(vtx(l,m,i+1,j).vec)
+			local im = vec3d(vtx(l,m,i-1,j).vec)
+			local jp = vec3d(vtx(l,m,i,j+1).vec)
+			local jm = vec3d(vtx(l,m,i,j-1).vec)
+			c = -(ip-im):cross(jp-jm):normalize()
+			cache[l][m][i][j] = c
+		end
 		return c
 	end
 end
