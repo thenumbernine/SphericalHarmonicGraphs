@@ -1,4 +1,4 @@
 local cache = {}
 local factorial
-factorial = [l] cache ?[assertge(l, 0)] : l == 0 ?? 1 : l * factorial(l-1)
+factorial = [l] cache ?[assertge(l, 0)] = l == 0 ? 1 : l * factorial(l-1)
 return factorial
