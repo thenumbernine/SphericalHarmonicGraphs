@@ -65,7 +65,7 @@ end
 function SHApp:initGL(...)
 	program = require 'gl.program'{
 		version = 'latest',
-		header = 'precision highp float;',
+		precision = 'best',
 		vertexCode = [[
 in vec3 vertex, normal, color;
 uniform mat4 projMat, mvMat;
@@ -97,7 +97,7 @@ void main() {
 				local colors = table()
 				local vertexes = table()
 				local normals = table()
-				
+
 				for j=0,jdiv do
 					for iofs=0,1 do
 						local vsrc = vtx(l,m,i+iofs,j)
@@ -141,7 +141,7 @@ void main() {
 			end
 		end
 	end
-	
+
 	gl.glEnable(gl.GL_DEPTH_TEST)
 end
 
