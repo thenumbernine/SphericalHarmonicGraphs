@@ -16,7 +16,6 @@ local idiv = 360
 local jdiv = 180
 
 local SHApp = require 'glapp.orbit'():subclass()
-SHApp.viewUseBuiltinMatrixMath = true
 SHApp.title = 'Spherical Harmonics Graph'
 SHApp.viewDist = lmax
 
