@@ -1,0 +1,22 @@
+name = "SphericalHarmonicGraphs"
+files = {
+	["README.md"] = "SphericalHarmonicGraphs/README.md",
+	["SphericalHarmonicGraphs-dev-1.rockspec"] = "SphericalHarmonicGraphs/SphericalHarmonicGraphs-dev-1.rockspec",
+	["associatedlegendre.lua"] = "SphericalHarmonicGraphs/associatedlegendre.lua",
+	["associatedlegendre.rua"] = "SphericalHarmonicGraphs/associatedlegendre.rua",
+	["factorial.lua"] = "SphericalHarmonicGraphs/factorial.lua",
+	["factorial.rua"] = "SphericalHarmonicGraphs/factorial.rua",
+	["images/image1.png"] = "SphericalHarmonicGraphs/images/image1.png",
+	["plot_associatedlegendre.lua"] = "SphericalHarmonicGraphs/plot_associatedlegendre.lua",
+	["run.lua"] = "SphericalHarmonicGraphs/run.lua",
+	["run.rua"] = "SphericalHarmonicGraphs/run.rua",
+	["sphericalharmonics.lua"] = "SphericalHarmonicGraphs/sphericalharmonics.lua",
+}
+deps = {
+	"ext",
+	"gl",
+	"glapp",
+	"plot2d",
+	"symmath",
+	"vec-ffi",
+}
