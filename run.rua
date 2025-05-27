@@ -21,11 +21,11 @@ SHApp.viewDist = lmax
 local vtx
 do
 	local cache = {}
-	vtx = [l,m,i,j]
+	vtx = |l,m,i,j|
 			cache ?[l]={} ?[m]={} ?[i]={} ?[j]
-			=	([phi, theta]
-					(([Y]
-						(([r]
+			=	(|phi, theta|
+					((|Y|
+						((|r|
 							{
 								Y = Y,
 								vec=vec3d(
@@ -42,7 +42,7 @@ end
 local normal
 do
 	local cache = {}
-	normal = [l,m,i,j] cache ?[l]={} ?[m]={} ?[i]={} ?[j]
+	normal = |l,m,i,j| cache ?[l]={} ?[m]={} ?[i]={} ?[j]
 		=	-(vec3d(vtx(l,m,i+1,j).vec) - vec3d(vtx(l,m,i-1,j).vec))
 			:cross(vec3d(vtx(l,m,i,j+1).vec) - vec3d(vtx(l,m,i,j-1).vec))
 			:normalize()
@@ -131,7 +131,7 @@ void main() {
 	gl.glEnable(gl.GL_DEPTH_TEST)
 end
 
-SHApp.update = [:] do
+SHApp.update = |:| do
 	SHApp.super.update(self)
 	gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 	for _,obj in ipairs(sceneobjs) do
