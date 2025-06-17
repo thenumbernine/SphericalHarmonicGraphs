@@ -1,5 +1,5 @@
-local factorial = require 'factorial'
-local associatedLegendre = require 'associatedlegendre'
+local factorial = require 'SphericalHarmonicGraphs.factorial'
+local associatedLegendre = require 'SphericalHarmonicGraphs.associatedlegendre'
 
 local function complexSphericalHarmonics(l, m, theta, phi)
 	local P = associatedLegendre(l,m,math.cos(theta))

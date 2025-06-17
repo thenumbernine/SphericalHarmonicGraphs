@@ -1,5 +1,5 @@
 local symmath = require 'symmath'
-local factorial = require 'factorial'
+local factorial = require 'SphericalHarmonicGraphs.factorial'
 
 local associatedLegendre
 do
