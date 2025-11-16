@@ -5,8 +5,10 @@ local cmdline = require 'ext.cmdline'.validate{
 	gl = {desc='which gl backend to use'},
 }(...)
 
-local gl = require 'gl.setup'(cmdline.gl or 'OpenGL')
 local vec3d = require 'vec-ffi.vec3d'
+local gl = require 'gl.setup'(cmdline.gl or 'OpenGL')
+local GLProgram = require 'gl.program'
+local GLSceneObject = require 'gl.sceneobject'
 local sphericalHarmonics = require 'sphericalharmonics'
 
 local lmax = tonumber(cmdline.l) or 3
@@ -48,8 +50,8 @@ do
 			:normalize()
 end
 
-function SHApp:initGL(...)
-	program = require 'gl.program'{
+SHApp.initGL = |:, ...| do
+	program = GLProgram{
 		version = 'latest',
 		precision = 'best',
 		vertexCode = [[
@@ -78,53 +80,67 @@ void main() {
 			print('building l='..l..' m='..m)
 			local vofs = vec3d(m,lmax/2-l,0)
 			--gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
+
+			local colors = table()
+			local vertexes = table()
+			local normals = table()
+
+			for j=0,jdiv do
+				for i=0,idiv do
+					local vsrc = vtx(l,m,i,j)
+					if vsrc.Y >= 0 then
+						colors:append{1,0,0}
+					else
+						colors:append{0,1,1}
+					end
+					normals:append{normal(l,m,i,j):unpack()}
+					vertexes:append{(vsrc.vec + vofs):unpack()}
+				end
+			end
+
+			local indexes = table()
 			for i=0,idiv-1 do
-
-				local colors = table()
-				local vertexes = table()
-				local normals = table()
-
+				local index = table()
+				indexes:insert(index)
 				for j=0,jdiv do
 					for iofs=0,1 do
-						local vsrc = vtx(l,m,i+iofs,j)
-						if vsrc.Y >= 0 then
-							colors:append{1,0,0}
-						else
-							colors:append{0,1,1}
-						end
-						normals:append{normal(l,m,i+iofs,j):unpack()}
-						vertexes:append{(vsrc.vec + vofs):unpack()}
+						index:insert((i + iofs) + (idiv + 1) * j)
 					end
 				end
-
-				sceneobjs:insert(require 'gl.sceneobject'{
-					program = program,
-					vertexes = {
-						data = vertexes,
-						count = #vertexes / 3,
-						dim = 3,
-					},
-					geometry = {
-						mode = gl.GL_TRIANGLE_STRIP,
-					},
-					attrs = {
-						color = {
-							buffer = {
-								data = colors,
-								count = #colors / 3,
-								dim = 3,
-							},
-						},
-						normal = {
-							buffer = {
-								data = normals,
-								count = #normals / 3,
-								dim = 3,
-							},
-						},
-					},
-				})
 			end
+
+			sceneobjs:insert(GLSceneObject{
+				program = program,
+				vertexes = {
+					data = vertexes,
+					count = #vertexes / 3,
+					dim = 3,
+				},
+				geometries = indexes:mapi(function(index)
+					return {
+						mode = gl.GL_TRIANGLE_STRIP,
+						indexes = {
+							data = index,
+						},
+					}
+				end),
+				attrs = {
+					color = {
+						buffer = {
+							data = colors,
+							count = #colors / 3,
+							dim = 3,
+						},
+					},
+					normal = {
+						buffer = {
+							data = normals,
+							count = #normals / 3,
+							dim = 3,
+						},
+					},
+				},
+			})
 		end
 	end
 
