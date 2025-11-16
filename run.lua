@@ -88,6 +88,7 @@ void main() {
 	}:useNone()
 
 	sceneobjs = table()
+require 'ext.timer'('building meshes', function()
 	for l=0,lmax do
 		for m=-l,l do
 			print('building l='..l..' m='..m)
@@ -156,7 +157,7 @@ void main() {
 			})
 		end
 	end
-
+end)
 	gl.glEnable(gl.GL_DEPTH_TEST)
 end
 

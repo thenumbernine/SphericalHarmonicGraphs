@@ -45,6 +45,8 @@ void main() {
 ]],
 	}:useNone()
 
+require 'ext.timer'('building meshes', function()
+
 	-- save our multithread parameters up front
 	local lms = table()
 	for l=0,lmax do
@@ -205,6 +207,7 @@ lmresults[tonumber(task)+1] = {
 			},
 		})
 	end
+end)
 
 	--gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
 	gl.glEnable(gl.GL_DEPTH_TEST)
