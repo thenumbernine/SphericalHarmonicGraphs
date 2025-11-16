@@ -10,6 +10,8 @@ files = {
 	["plot_associatedlegendre.lua"] = "SphericalHarmonicGraphs/plot_associatedlegendre.lua",
 	["run.lua"] = "SphericalHarmonicGraphs/run.lua",
 	["run.rua"] = "SphericalHarmonicGraphs/run.rua",
+	["run-mt.lua"] = "SphericalHarmonicGraphs/run-mt.lua",
+	["run-mt.rua"] = "SphericalHarmonicGraphs/run-mt.rua",
 	["sphericalharmonics.lua"] = "SphericalHarmonicGraphs/sphericalharmonics.lua",
 }
 deps = {
