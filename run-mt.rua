@@ -6,8 +6,6 @@ local cmdline = require 'ext.cmdline'.validate{
 }(...)
 
 local template = require 'template'
-local table = require 'ext.table'
-local tolua = require 'ext.tolua'
 local gl = require 'gl.setup'(cmdline.gl or 'OpenGL')
 local GLProgram = require 'gl.program'
 local GLSceneObject = require 'gl.sceneobject'
@@ -45,7 +43,7 @@ void main() {
 ]],
 	}:useNone()
 
-require 'ext.timer'('building meshes', || do
+timer('building meshes', || do
 
 	-- save our multithread parameters up front
 	local lms = table()
@@ -159,7 +157,7 @@ lmresults[tonumber(task)+1] = {
 	-- recombine each worker's "lmresults" into a single table
 	local lmresults = table()
 	for _,worker in ipairs(pool) do
-		local lmresults_lm = worker.thread.lua:global'lmresults'
+		local lmresults_lm = worker.thread.lua.global.lmresults
 		for i,results in pairs(lmresults_lm) do
 			assert(not lmresults[i])	-- no 2 threads should have done the same work
 			lmresults[i] = results

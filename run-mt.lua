@@ -157,7 +157,7 @@ lmresults[tonumber(task)+1] = {
 	-- recombine each worker's "lmresults" into a single table
 	local lmresults = table()
 	for _,worker in ipairs(pool) do
-		local lmresults_lm = worker.thread.lua:global'lmresults'
+		local lmresults_lm = worker.thread.lua.global.lmresults
 		for i,results in pairs(lmresults_lm) do
 			assert(not lmresults[i])	-- no 2 threads should have done the same work
 			lmresults[i] = results
