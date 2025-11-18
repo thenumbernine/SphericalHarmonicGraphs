@@ -53,11 +53,13 @@ timer('building meshes', || do
 		end
 	end
 
-	-- you can't yet use langfix on thread-lua threads
-	-- since it uses lua-lua which uses luaL_load* functions rather than calling "load"
 	local pool = require 'thread.pool'{
 		initcode = template([[
-local table = require 'ext.table'
+-- auto put these at the header of thread's code when it detects langfix?
+-- or nah ... they do slow things down from 1s to 11s
+require 'ext'
+require 'langfix'
+
 local vec3d = require 'vec-ffi.vec3d'
 local sphericalHarmonics = require 'sphericalharmonics'
 
@@ -79,38 +81,28 @@ local l, m = table.unpack(lms[tonumber(task)+1])
 -- cache needs to be reset between jobs anyways
 
 local vtxcache = {}
-local function vtx(i,j)
-	vtxcache[i] = vtxcache[i] or {}
-	if vtxcache[i][j] then return vtxcache[i][j] end
-
-	local phi = i/idiv*2*math.pi
-	local theta = j/jdiv*math.pi
-	local Y = sphericalHarmonics.real(l, m, theta, phi)
-	local r = math.abs(Y)
-	local x = r * math.sin(theta) * math.cos(phi)
-	local y = r * math.sin(theta) * math.sin(phi)
-	local z = r * math.cos(theta)
-	local c = {Y=Y, vec=vec3d(x,y,z)}
-	vtxcache[i][j] = c
-	return c
-end
+local vtx = |i,j|
+		vtxcache ?[i]={} ?[j]
+		=	(|phi, theta|
+				((|Y|
+					((|r|
+						{
+							Y = Y,
+							vec=vec3d(
+								r * math.sin(theta) * math.cos(phi),
+								r * math.sin(theta) * math.sin(phi),
+								r * math.cos(theta)
+							),
+						}
+					)(math.abs(Y)))
+				)(sphericalHarmonics.real(l, m, theta, phi)))
+			)(i/idiv*2*math.pi, j/jdiv*math.pi)
 
 local normalcache = {}
-local function normal(i,j)
-	normalcache[i] = normalcache[i] or {}
-	local c = normalcache[i][j]
-	if not c then
-		local ip = vec3d(vtx(i+1,j).vec)
-		local im = vec3d(vtx(i-1,j).vec)
-		local jp = vec3d(vtx(i,j+1).vec)
-		local jm = vec3d(vtx(i,j-1).vec)
-		c = -(ip-im):cross(jp-jm):normalize()
-		normalcache[i][j] = c
-	end
-	return c
-end
-
-
+local normal = |i,j| normalcache ?[i]={} ?[j]
+	=	-(vec3d(vtx(i+1,j).vec) - vec3d(vtx(i-1,j).vec))
+		:cross(vec3d(vtx(i,j+1).vec) - vec3d(vtx(i,j-1).vec))
+		:normalize()
 
 local vofs = vec3d(m,lmax/2-l,0)
 
@@ -154,18 +146,21 @@ lmresults[tonumber(task)+1] = {
 	-- cycle thread pool across all our lms
 	pool:cycle(#lms)
 
+	-- get segfault-on-exit if I don't manually close this ...
+	pool:closed()
+
 	-- recombine each worker's "lmresults" into a single table
 	local lmresults = table()
-	for _,worker in ipairs(pool) do
-		local lmresults_lm = worker.thread.lua.global.lmresults
+	for i,worker in ipairs(pool) do
+		local thG = worker.thread.lua.global
+		assert(thG.exitStatus, thG.errmsg)
+
+		local lmresults_lm = thG.lmresults
 		for i,results in pairs(lmresults_lm) do
 			assert(not lmresults[i])	-- no 2 threads should have done the same work
 			lmresults[i] = results
 		end
 	end
-
-	-- get segfault-on-exit if I don't manually close this ...
-	pool:closed()
 
 	sceneobjs = table()
 	for lm,results in ipairs(lmresults) do
