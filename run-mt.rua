@@ -81,9 +81,9 @@ local l, m = table.unpack(lms[tonumber(task)+1])
 -- cache needs to be reset between jobs anyways
 
 local vtxcache = {}
-local vtx = |i,j|
-		vtxcache ?[i]={} ?[j]
-		=	(|phi, theta|
+local vtx = |i,j| (
+		(vtxcache[i] ??:= {})[j] ??:=
+			(|phi, theta|
 				((|Y|
 					((|r|
 						{
@@ -97,13 +97,14 @@ local vtx = |i,j|
 					)(math.abs(Y)))
 				)(sphericalHarmonics.real(l, m, theta, phi)))
 			)(i/idiv*2*math.pi, j/jdiv*math.pi)
-
+)
 local normalcache = {}
-local normal = |i,j| normalcache ?[i]={} ?[j]
-	=	-(vec3d(vtx(i+1,j).vec) - vec3d(vtx(i-1,j).vec))
+local normal = |i,j|(
+	(normalcache[i] ??:= {})[j] ??:=
+		-(vec3d(vtx(i+1,j).vec) - vec3d(vtx(i-1,j).vec))
 		:cross(vec3d(vtx(i,j+1).vec) - vec3d(vtx(i,j-1).vec))
 		:normalize()
-
+)
 local vofs = vec3d(m,lmax/2-l,0)
 
 local colors = table()
